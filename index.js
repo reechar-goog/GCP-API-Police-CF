@@ -25,7 +25,25 @@ exports.apiPolice = (event, callback) => {
 
   const blacklist = ['translate.googleapis.com']
 
-  //not used unless whiteListMode set to true
+  console.log(`${accountID} attempted to activate ${apiName} in ${projectID}`)
+
+  if (blacklist.indexOf(apiName) > -1) {
+    console.error(`${apiName} is blacklisted and will be disabled`);
+    servicemanagement.services.disable({ auth: authenticationClient, serviceName: apiName, requestBody: { consumerId: projectID } });
+  } else {
+    console.log(`${apiName} not in blacklist`);
+  }
+  callback();
+}
+
+exports.apiPoliceWhiteList = (event, callback) => {
+  const pubsubMessage = event.data;
+  const cloudAuditLogMsg = JSON.parse(Buffer.from(pubsubMessage.data, 'base64').toString())
+
+  const accountID = cloudAuditLogMsg.protoPayload.authenticationInfo.principalEmail
+  const apiName = cloudAuditLogMsg.protoPayload.request.serviceName
+  const projectID = "project:" + cloudAuditLogMsg.resource.labels.project_id
+
   const whitelist = ['bigquery-json.googleapis.com',
     'cloudapis.googleapis.com',
     'clouddebugger.googleapis.com',
@@ -45,23 +63,12 @@ exports.apiPolice = (event, callback) => {
     'storage-component.googleapis.com',
     'vision.googleapis.com'] //vision.googleapis.com not part of default enable APIs, here for exmaple only
 
-  const whiteListMode = false
-
   console.log(`${accountID} attempted to activate ${apiName} in ${projectID}`)
-  if (whiteListMode) {
-    if (whitelist.indexOf(apiName) > -1) {
-      console.log(`${apiName} is whitelisted`);
-    } else {
-      console.error(`${apiName} not in whitelist and will be disabled`);
-      servicemanagement.services.disable({ auth: authenticationClient, serviceName: apiName, requestBody: { consumerId: projectID } });
-    }
+  if (whitelist.indexOf(apiName) > -1) {
+    console.log(`${apiName} is whitelisted`);
   } else {
-    if (blacklist.indexOf(apiName) > -1) {
-      console.error(`${apiName} is blacklisted and will be disabled`);
-      servicemanagement.services.disable({ auth: authenticationClient, serviceName: apiName, requestBody: { consumerId: projectID } });
-    } else {
-      console.log(`${apiName} not in blacklist`);
-    }
+    console.error(`${apiName} not in whitelist and will be disabled`);
+    servicemanagement.services.disable({ auth: authenticationClient, serviceName: apiName, requestBody: { consumerId: projectID } });
   }
   callback();
 }
