@@ -23,15 +23,15 @@ exports.apiPolice = (event, callback) => {
   const apiName = cloudAuditLogMsg.protoPayload.request.serviceName
   const projectID = "project:" + cloudAuditLogMsg.resource.labels.project_id
 
-  const blacklist = ['translate.googleapis.com']
+  const blockedList = ['translate.googleapis.com']
 
   console.log(`${accountID} attempted to activate ${apiName} in ${projectID}`)
 
-  if (blacklist.indexOf(apiName) > -1) {
-    console.error(`${apiName} is blacklisted and will be disabled`);
+  if (blockedList.indexOf(apiName) > -1) {
+    console.error(`${apiName} is on the blocked API list and will be disabled`);
     servicemanagement.services.disable({ auth: authenticationClient, serviceName: apiName, requestBody: { consumerId: projectID } });
   } else {
-    console.log(`${apiName} not in blacklist`);
+    console.log(`${apiName} not blocked`);
   }
   callback();
 }
