@@ -6,4 +6,7 @@ To run this Cloud Function in blockedMode, deploy the `apiPolice` function in `i
 
 To run this Cloud Function in allowMode, deploy the `apiPoliceAllowedList` function in `index.js`. To customize for your organizations usage, update `const allowedList`.
 
+## Deployment Guides
 [Documentation on deploying Google Cloud Function](https://cloud.google.com/functions/docs/deploying/)
+[Terraform Module](https://github.com/reechar-goog/GCP-API-Police-CF-tf)
+[PDF step-by-step gcloud guide](https://github.com/reechar-goog/GCP-API-Police-CF/blob/master/api-police-guide.pdf)
