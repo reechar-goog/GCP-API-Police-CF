@@ -36,7 +36,13 @@ exports.apiPolice = (event, callback) => {
   const cloudAuditLogMsg = JSON.parse(Buffer.from(pubsubMessage.data, 'base64').toString())
 
   const accountID = cloudAuditLogMsg.protoPayload.authenticationInfo.principalEmail
-  const apiName = cloudAuditLogMsg.protoPayload.request.serviceName
+  var apiName;
+  if (cloudAuditLogMsg.protoPayload.methodName == 'google.api.servicemanagement.v1.ServiceManager.ActivateServices'){
+    var resourceName = cloudAuditLogMsg.protoPayload.resourceName;
+    apiName = resourceName.substring(resourceName.indexOf('[')+1, resourceName.indexOf(']'))
+  } else {
+    apiName = cloudAuditLogMsg.protoPayload.request.serviceName;
+  }
   const projectID = "project:" + cloudAuditLogMsg.resource.labels.project_id
 
   const blockedList = ['translate.googleapis.com']
