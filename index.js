@@ -37,7 +37,7 @@ exports.apiPolice = (event, callback) => {
   const accountID = cloudAuditLogMsg.protoPayload.authenticationInfo.principalEmail
   const resourceName = cloudAuditLogMsg.protoPayload.resourceName;
   var apiName;
-  if (cloudAuditLogMsg.protoPayload.methodName == 'google.api.servicemanagement.v1.ServiceManager.ActivateServices'){
+  if (cloudAuditLogMsg.protoPayload.methodName.endsWith('ActivateServices')){
     apiName = resourceName.substring(resourceName.indexOf('[')+1, resourceName.indexOf(']'))
   } else {
     apiName = resourceName.substring(resourceName.lastIndexOf('/')+1)
