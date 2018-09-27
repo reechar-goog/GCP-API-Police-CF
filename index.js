@@ -34,17 +34,15 @@ function getAuthClient() {
 exports.apiPolice = (event, callback) => {
   const pubsubMessage = event.data;
   const cloudAuditLogMsg = JSON.parse(Buffer.from(pubsubMessage.data, 'base64').toString())
-
   const accountID = cloudAuditLogMsg.protoPayload.authenticationInfo.principalEmail
   var apiName;
   if (cloudAuditLogMsg.protoPayload.methodName == 'google.api.servicemanagement.v1.ServiceManager.ActivateServices'){
     var resourceName = cloudAuditLogMsg.protoPayload.resourceName;
     apiName = resourceName.substring(resourceName.indexOf('[')+1, resourceName.indexOf(']'))
   } else {
-    apiName = cloudAuditLogMsg.protoPayload.request.serviceName;
+    apiName = resourceName.substring(resourceName.lastIndexOf('/')+1)
   }
   const projectID = "project:" + cloudAuditLogMsg.resource.labels.project_id
-
   const blockedList = ['translate.googleapis.com']
 
   console.log(`${accountID} attempted to activate ${apiName} in ${projectID}`)
